@@ -79,17 +79,38 @@ const createCartItemElement = ({ id, title, price }) => {
   return li;
 };
 
-window.onload = async () => { 
+const loadProducts = async (productId) => {
+  const product = await fetchItem(productId);
+  olCartItems.appendChild(createCartItemElement(product));
+};
+
+const buttonEvent = async (button) => {
+  const productInfos = await fetchItem(button.productId);
+  olCartItems.appendChild(createCartItemElement(productInfos));
+  if (localStorage.cartItems) {
+    const cartItems = JSON.parse(getSavedCartItems());
+    cartItems.push(button.productId);
+    saveCartItems(JSON.stringify(cartItems));
+    return;
+  }
+  saveCartItems(JSON.stringify([button.productId]));
+};
+
+window.onload = async () => {
+  // CARREGA PRODUTOS
   const response = await fetchProducts('computador');
   const { results } = response;
   results.forEach((product) => {
     sectionItems.appendChild(createProductItemElement(product));
   });
+  // EVENTOS DO CARRINHO
   const buttons = document.querySelectorAll('.item__add');
   buttons.forEach((button) => {
-    button.addEventListener('click', async (e) => {
-      const productInfos = await fetchItem(button.productId);
-      olCartItems.appendChild(createCartItemElement(productInfos));
-    });
+    button.addEventListener('click', () => buttonEvent(button));
   });
+  // PEGAR DO LOCALSTORAGE
+  if (getSavedCartItems()) {
+    const productsIds = getSavedCartItems();
+    productsIds.forEach(loadProducts);
+  }
 };
