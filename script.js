@@ -4,6 +4,7 @@
 // Fique a vontade para modificar o código já escrito e criar suas próprias funções!
 
 const sectionItems = document.querySelector('.items');
+const olCartItems = document.querySelector('.cart__items');
 
 /**
  * Função responsável por criar e retornar o elemento de imagem do produto.
@@ -46,7 +47,9 @@ const createProductItemElement = ({ id, title, thumbnail }) => {
   section.appendChild(createCustomElement('span', 'item_id', id));
   section.appendChild(createCustomElement('span', 'item__title', title));
   section.appendChild(createProductImageElement(thumbnail));
-  section.appendChild(createCustomElement('button', 'item__add', 'Adicionar ao carrinho!'));
+  const button = createCustomElement('button', 'item__add', 'Adicionar ao carrinho!');
+  button.productId = id;
+  section.appendChild(button);
 
   return section;
 };
@@ -57,6 +60,10 @@ const createProductItemElement = ({ id, title, thumbnail }) => {
  * @returns {string} ID do produto.
  */
 const getIdFromProductItem = (product) => product.querySelector('span.id').innerText;
+
+const cartItemClickListener = () => {
+  // aa
+};
 
 /**
  * Função responsável por criar e retornar um item do carrinho.
@@ -79,5 +86,12 @@ window.onload = async () => {
   const { results } = response;
   results.forEach((product) => {
     sectionItems.appendChild(createProductItemElement(product));
+  });
+  const buttons = document.querySelectorAll('.item__add');
+  buttons.forEach((button) => {
+    button.addEventListener('click', async (e) => {
+      const productInfos = await fetchItem(button.productId);
+      olCartItems.appendChild(createCartItemElement(productInfos));
+    });
   });
 };
