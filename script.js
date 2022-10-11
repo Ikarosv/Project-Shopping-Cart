@@ -72,4 +72,4 @@ const createCartItemElement = ({ id, title, price }) => {
   return li;
 };
 
-window.onload = () => { };
+window.onload = async () => { console.log(await fetchProducts('computador')); };
