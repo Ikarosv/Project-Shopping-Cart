@@ -17,4 +17,15 @@ describe('2 - Teste a função fetchItem', () => {
     const endpoint = 'https://api.mercadolibre.com/items/MLB1615760527' 
     expect(global.fetch).toHaveBeenCalledWith(endpoint);
   });
+
+  it('Testa se a função fetchItem retorna a estrutura de dados correta.', async () => {
+    const actual = await fetchItem('MLB1615760527');
+    expect(actual).toMatchObject(item);
+  });
+
+  it('Testa se ao chamar a função fetchItem sem argumento ela retorna um erro. ', () => {
+    expect(async () => {
+      await fetchItem();
+    }).toThrow('You must provide an url');
+  });
 });
