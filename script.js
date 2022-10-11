@@ -61,9 +61,7 @@ const createProductItemElement = ({ id, title, thumbnail }) => {
  */
 const getIdFromProductItem = (product) => product.querySelector('span.id').innerText;
 
-const cartItemClickListener = () => {
-  // aa
-};
+const cartItemClickListener = (e) => olCartItems.removeChild(e.target);
 
 /**
  * Função responsável por criar e retornar um item do carrinho.
