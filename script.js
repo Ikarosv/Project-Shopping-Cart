@@ -5,6 +5,7 @@
 
 const sectionItems = document.querySelector('.items');
 const olCartItems = document.querySelector('.cart__items');
+const buttonEmptyCart = document.querySelector('.empty-cart');
 
 /**
  * Função responsável por criar e retornar o elemento de imagem do produto.
@@ -120,6 +121,13 @@ const buttonEvent = async (button) => {
   }
   saveCartItems(JSON.stringify([button.productId]));
 };
+
+const clearCart = () => {
+  olCartItems.innerHTML = '';
+  updateSpan();
+  localStorage.removeItem('cartItems');
+};
+buttonEmptyCart.addEventListener('click', clearCart);
 
 window.onload = async () => {
   // CARREGA PRODUTOS
