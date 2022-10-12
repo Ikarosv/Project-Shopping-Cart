@@ -33,6 +33,16 @@ const createCustomElement = (element, className, innerText) => {
   return e;
 };
 
+const loading = (parent) => {
+  const headFour = createCustomElement('h4', 'loading', 'carregando...');
+  parent.appendChild(headFour);
+};
+
+const loaded = (parent) => {
+  const headFour = parent.querySelector('.loading');
+  parent.removeChild(headFour);
+};
+
 /**
  * Função responsável por criar e retornar o elemento do produto.
  * @param {Object} product - Objeto do produto. 
@@ -41,7 +51,7 @@ const createCustomElement = (element, className, innerText) => {
  * @param {string} product.thumbnail - URL da imagem do produto.
  * @returns {Element} Elemento de produto.
  */
-const createProductItemElement = ({ id, title, thumbnail }) => {
+const createProductItemElement = ({ id, title, thumbnail, price }) => {
   const section = document.createElement('section');
   section.className = 'item';
 
@@ -50,6 +60,8 @@ const createProductItemElement = ({ id, title, thumbnail }) => {
   section.appendChild(createProductImageElement(thumbnail));
   const button = createCustomElement('button', 'item__add', 'Adicionar ao carrinho!');
   button.productId = id;
+  button.productTitle = title;
+  button.productPrice = price;
   section.appendChild(button);
 
   return section;
@@ -103,23 +115,30 @@ const createCartItemElement = ({ id, title, price }) => {
 };
 
 const loadProducts = async (productId) => {
+  loading(olCartItems);
   const product = await fetchItem(productId);
   const productChild = createCartItemElement(product);
   productChild.productId = productId;
   productChild.productPrice = product.price;
+  loaded(olCartItems);
   olCartItems.appendChild(productChild);
   updateSpan();
 };
 
 const buttonEvent = async (button) => {
   loadProducts(button.productId);
+  const productInfos = {
+    id: button.productId,
+    title: button.productTitle,
+    price: button.productPrice,
+  };
   if (localStorage.cartItems) {
     const cartItemsIds = getSavedCartItems();
-    cartItemsIds.push(button.productId);
+    cartItemsIds.push(productInfos);
     saveCartItems(JSON.stringify(cartItemsIds));
     return;
   }
-  saveCartItems(JSON.stringify([button.productId]));
+  saveCartItems(JSON.stringify([productInfos]));
 };
 
 const clearCart = () => {
@@ -129,10 +148,21 @@ const clearCart = () => {
 };
 buttonEmptyCart.addEventListener('click', clearCart);
 
+const loadProductFromStorage = (product) => {
+  const productChild = createCartItemElement(product);
+  productChild.productId = product.productId;
+  productChild.productPrice = product.productPrice;
+
+  olCartItems.appendChild(productChild);
+  updateSpan();
+};
+
 window.onload = async () => {
   // CARREGA PRODUTOS
+  loading(sectionItems);
   const response = await fetchProducts('computador');
   const { results } = response;
+  loaded(sectionItems);
   results.forEach((product) => {
     sectionItems.appendChild(createProductItemElement(product));
   });
@@ -144,6 +174,6 @@ window.onload = async () => {
   // PEGAR DO LOCALSTORAGE
   if (localStorage.cartItems) {
     const productsIds = getSavedCartItems();
-    productsIds.forEach(loadProducts);
+    productsIds.forEach(loadProductFromStorage);
   }
 };
