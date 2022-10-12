@@ -61,7 +61,29 @@ const createProductItemElement = ({ id, title, thumbnail }) => {
  */
 const getIdFromProductItem = (product) => product.querySelector('span.id').innerText;
 
-const cartItemClickListener = (e) => olCartItems.removeChild(e.target);
+const returnTotalPrice = (cartProducts) => {
+  let totalPrice = 0;
+  cartProducts.forEach(({ productPrice }) => {
+    totalPrice += productPrice;
+  });
+  return totalPrice;
+};
+
+const updateSpan = () => {
+  const spanTotalPrice = document.querySelector('.total-price');
+  const cartProducts = olCartItems.querySelectorAll('.cart__item');
+  const totalPrice = returnTotalPrice(cartProducts);
+  spanTotalPrice.innerText = `$${totalPrice}`;
+};
+
+const cartItemClickListener = (e) => {
+  olCartItems.removeChild(e.target);
+  const localStorageCartItems = getSavedCartItems();
+  const idIndex = localStorageCartItems.indexOf(e.target.productId);
+  localStorageCartItems.splice(idIndex, 1);
+  saveCartItems(JSON.stringify(localStorageCartItems));
+  updateSpan();
+};
 
 /**
  * Função responsável por criar e retornar um item do carrinho.
@@ -81,16 +103,19 @@ const createCartItemElement = ({ id, title, price }) => {
 
 const loadProducts = async (productId) => {
   const product = await fetchItem(productId);
-  olCartItems.appendChild(createCartItemElement(product));
+  const productChild = createCartItemElement(product);
+  productChild.productId = productId;
+  productChild.productPrice = product.price;
+  olCartItems.appendChild(productChild);
+  updateSpan();
 };
 
 const buttonEvent = async (button) => {
-  const productInfos = await fetchItem(button.productId);
-  olCartItems.appendChild(createCartItemElement(productInfos));
+  loadProducts(button.productId);
   if (localStorage.cartItems) {
-    const cartItems = JSON.parse(getSavedCartItems());
-    cartItems.push(button.productId);
-    saveCartItems(JSON.stringify(cartItems));
+    const cartItemsIds = getSavedCartItems();
+    cartItemsIds.push(button.productId);
+    saveCartItems(JSON.stringify(cartItemsIds));
     return;
   }
   saveCartItems(JSON.stringify([button.productId]));
@@ -109,7 +134,7 @@ window.onload = async () => {
     button.addEventListener('click', () => buttonEvent(button));
   });
   // PEGAR DO LOCALSTORAGE
-  if (getSavedCartItems()) {
+  if (localStorage.cartItems) {
     const productsIds = getSavedCartItems();
     productsIds.forEach(loadProducts);
   }
