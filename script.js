@@ -76,6 +76,13 @@ const cartItemClickListener = (e) => {
   updateSpan();
 };
 
+const createImg = (src, className) => {
+  const img = document.createElement('img');
+  img.src = src;
+  img.className = className;
+  return img;
+};
+
 /**
  * Função responsável por criar e retornar um item do carrinho.
  * @param {Object} product - Objeto do produto.
@@ -84,13 +91,17 @@ const cartItemClickListener = (e) => {
  * @param {string} product.price - Preço do produto.
  * @returns {Element} Elemento de um item do carrinho.
  */
-const createCartItemElement = ({ id, title, price }) => {
+const createCartItemElement = ({ id, title, price, thumbnail }) => {
   const li = document.createElement('li');
+  console.log(thumbnail);
   li.className = 'cart__item';
-  li.innerText = `ID: ${id} | TITLE: ${title} | PRICE: $${price}`;
+  li.appendChild(createImg(thumbnail, 'cart__thumb'));
+  li.appendChild(createCustomElement('p', 'cart__item__title',
+  `ID: ${id} | TITLE: ${title} | PRICE: $${price}`));
   li.addEventListener('click', cartItemClickListener);
   li.productId = id;
   li.productPrice = price;
+  li.thumbnail = thumbnail;
   return li;
 };
 
@@ -109,13 +120,10 @@ const loadProducts = async (productId) => {
   }
 };
 
-const buttonEvent = async ({ productId: id, productTitle: title, productPrice: price }) => {
+const buttonEvent = async ({ productId: id, productTitle: title,
+  productPrice: price, productThumb: thumbnail }) => {
   try {
-    const productInfos = {
-      id,
-      title,
-      price,
-    };
+    const productInfos = { id, title, price, thumbnail };
     loadProducts(id);
     if (localStorage.cartItems) {
       const cartItemsIds = getSavedCartItems();
@@ -149,6 +157,7 @@ const createProductItemElement = ({ id, title, thumbnail, price }) => {
   button.productId = id;
   button.productTitle = title;
   button.productPrice = price;
+  button.productThumb = thumbnail;
   button.addEventListener('click', () => buttonEvent(button));
   section.appendChild(button);
 
@@ -164,9 +173,7 @@ buttonEmptyCart.addEventListener('click', clearCart);
 
 const loadProductFromStorage = (product) => {
   const productChild = createCartItemElement(product);
-  productChild.productId = product.id;
-  productChild.productPrice = product.price;
-
+  productChild.thumbnail = product.thumbnail;
   olCartItems.appendChild(productChild);
   updateSpan();
 };
