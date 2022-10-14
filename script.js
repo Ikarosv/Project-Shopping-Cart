@@ -43,29 +43,7 @@ const loaded = (parent) => {
   parent.removeChild(headFour);
 };
 
-/**
- * Função responsável por criar e retornar o elemento do produto.
- * @param {Object} product - Objeto do produto. 
- * @param {string} product.id - ID do produto.
- * @param {string} product.title - Título do produto.
- * @param {string} product.thumbnail - URL da imagem do produto.
- * @returns {Element} Elemento de produto.
- */
-const createProductItemElement = ({ id, title, thumbnail, price }) => {
-  const section = document.createElement('section');
-  section.className = 'item';
-
-  section.appendChild(createCustomElement('span', 'item_id', id));
-  section.appendChild(createCustomElement('span', 'item__title', title));
-  section.appendChild(createProductImageElement(thumbnail));
-  const button = createCustomElement('button', 'item__add', 'Adicionar ao carrinho!');
-  button.productId = id;
-  button.productTitle = title;
-  button.productPrice = price;
-  section.appendChild(button);
-
-  return section;
-};
+// aaaaaaaaaaaaaaaaaaaaaaaaa
 
 /**
  * Função que recupera o ID do produto passado como parâmetro.
@@ -85,7 +63,6 @@ const returnTotalPrice = (cartProducts) => {
 const updateSpan = () => {
   const spanTotalPrice = document.querySelector('.total-price');
   const cartProducts = olCartItems.querySelectorAll('.cart__item');
-  console.log(cartProducts);
   const totalPrice = returnTotalPrice(cartProducts);
   spanTotalPrice.innerText = `$${totalPrice}`;
 };
@@ -112,34 +89,70 @@ const createCartItemElement = ({ id, title, price }) => {
   li.className = 'cart__item';
   li.innerText = `ID: ${id} | TITLE: ${title} | PRICE: $${price}`;
   li.addEventListener('click', cartItemClickListener);
+  li.productId = id;
+  li.productPrice = price;
   return li;
 };
 
 const loadProducts = async (productId) => {
-  loading(olCartItems);
-  const product = await fetchItem(productId);
-  const productChild = createCartItemElement(product);
-  productChild.productId = productId;
-  productChild.productPrice = product.price;
-  loaded(olCartItems);
-  olCartItems.appendChild(productChild);
-  updateSpan();
+  try {
+    loading(olCartItems);
+    const product = await fetchItem(productId);
+    const productChild = createCartItemElement(product);
+    loaded(olCartItems);
+    olCartItems.appendChild(productChild);
+    updateSpan();
+  } catch (error) {
+    olCartItems.appendChild(createCustomElement('p', 'warning',
+    `ID do produto inválido ${error.message}`));
+    throw error;
+  }
 };
 
-const buttonEvent = async (button) => {
-  loadProducts(button.productId);
-  const productInfos = {
-    id: button.productId,
-    title: button.productTitle,
-    price: button.productPrice,
-  };
-  if (localStorage.cartItems) {
-    const cartItemsIds = getSavedCartItems();
-    cartItemsIds.push(productInfos);
-    saveCartItems(JSON.stringify(cartItemsIds));
-    return;
+const buttonEvent = async ({ productId: id, productTitle: title, productPrice: price }) => {
+  try {
+    const productInfos = {
+      id,
+      title,
+      price,
+    };
+    loadProducts(id);
+    if (localStorage.cartItems) {
+      const cartItemsIds = getSavedCartItems();
+      cartItemsIds.push(productInfos);
+      saveCartItems(JSON.stringify(cartItemsIds));
+      return;
+    }
+    saveCartItems(JSON.stringify([productInfos]));
+  } catch (error) {
+    olCartItems.appendChild(createCustomElement('p', 'warning', `Algo está errado! ${error}`));
+    throw error;
   }
-  saveCartItems(JSON.stringify([productInfos]));
+};
+
+/**
+ * Função responsável por criar e retornar o elemento do produto.
+ * @param {Object} product - Objeto do produto. 
+ * @param {string} product.id - ID do produto.
+ * @param {string} product.title - Título do produto.
+ * @param {string} product.thumbnail - URL da imagem do produto.
+ * @returns {Element} Elemento de produto.
+ */
+const createProductItemElement = ({ id, title, thumbnail, price }) => {
+  const section = document.createElement('section');
+  section.className = 'item';
+
+  section.appendChild(createCustomElement('span', 'item_id', id));
+  section.appendChild(createCustomElement('span', 'item__title', title));
+  section.appendChild(createProductImageElement(thumbnail));
+  const button = createCustomElement('button', 'item__add', 'Adicionar ao carrinho!');
+  button.productId = id;
+  button.productTitle = title;
+  button.productPrice = price;
+  button.addEventListener('click', () => buttonEvent(button));
+  section.appendChild(button);
+
+  return section;
 };
 
 const clearCart = () => {
@@ -166,11 +179,6 @@ window.onload = async () => {
   loaded(sectionItems);
   results.forEach((product) => {
     sectionItems.appendChild(createProductItemElement(product));
-  });
-  // EVENTOS DO CARRINHO
-  const buttons = document.querySelectorAll('.item__add');
-  buttons.forEach((button) => {
-    button.addEventListener('click', () => buttonEvent(button));
   });
   // PEGAR DO LOCALSTORAGE
   if (localStorage.cartItems) {
