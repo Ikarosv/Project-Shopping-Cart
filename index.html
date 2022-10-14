@@ -11,6 +11,7 @@
     <link href="https://fonts.googleapis.com/css2?family=Epilogue:wght@400;700&display=swap" rel="stylesheet">
     <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
     <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@40,700,0,0" />
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@40,300,0,0" />
     <script src="./helpers/fetchItem.js" defer></script>
     <script src="./helpers/fetchProducts.js" defer></script>
     <script src="./helpers/saveCartItems.js" defer></script>
@@ -22,9 +23,18 @@
       <div class="container-title">
         <span class="title"><strong>trybe</strong>shopping</span>
       </div>
-      <i class="material-icons" style="font-size:45px;color:rgb(85, 26, 139)">shopping_cart</i>
-      <div class="container-cartTitle">
-        <span class="cart__title">Meu carrinho</span>
+
+      <label for="searchInput" class="section-search">
+        <input id="searchInput" class="search" placeholder="Pesquisar produtos" type="text">
+        <span class="material-symbols-outlined span-search">
+          search
+        </span>
+      </label>
+      <div class="container-cart">
+        <i class="material-icons" style="font-size:45px;color:rgb(85, 26, 139); align-self: center;">shopping_cart</i>
+        <div class="container-cartTitle">
+          <span class="cart__title">Meu carrinho</span>
+        </div>
       </div>
     </header>
     <button style="display: none;" id="back-to-top"><span class="material-symbols-outlined">
