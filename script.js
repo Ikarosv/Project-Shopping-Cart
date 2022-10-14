@@ -85,6 +85,7 @@ const returnTotalPrice = (cartProducts) => {
 const updateSpan = () => {
   const spanTotalPrice = document.querySelector('.total-price');
   const cartProducts = olCartItems.querySelectorAll('.cart__item');
+  console.log(cartProducts);
   const totalPrice = returnTotalPrice(cartProducts);
   spanTotalPrice.innerText = `$${totalPrice}`;
 };
@@ -150,8 +151,8 @@ buttonEmptyCart.addEventListener('click', clearCart);
 
 const loadProductFromStorage = (product) => {
   const productChild = createCartItemElement(product);
-  productChild.productId = product.productId;
-  productChild.productPrice = product.productPrice;
+  productChild.productId = product.id;
+  productChild.productPrice = product.price;
 
   olCartItems.appendChild(productChild);
   updateSpan();
