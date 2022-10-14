@@ -7,3 +7,5 @@ node_modules/
 cypress/reports
 cypress/screenshots
 coverage/
+publisher.sh
+trybe-filter-repo.sh
