@@ -5,6 +5,10 @@
   padding: 0;
 }
 
+html {
+  scroll-behavior: smooth;
+}
+
 body {
   background-color: rgb(246, 246, 246);
 }
@@ -167,3 +171,15 @@ button {
   border: 2px solid rgb(5, 52, 219);
   background-color: rgb(249, 249, 246);
 }
+
+#back-to-top {
+  position: fixed;
+  bottom: 50px;
+  left: 50px;
+  padding: 10px;
+  color: rgb(5, 52, 219);
+  border: none;
+  border-radius: 50%;
+  background: #fff159;
+}
+
