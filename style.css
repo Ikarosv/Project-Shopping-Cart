@@ -1,3 +1,5 @@
+@import url('https://fonts.googleapis.com/css2?family=Poppins:wght@200;300&display=swap');
+
 * {
   box-sizing: border-box;
   font-family: Epilogue, sans-serif;
@@ -11,6 +13,8 @@ html {
 
 body {
   background-color: rgb(246, 246, 246);
+  font-family: 'Poppins', sans-serif;
+  font-weight: 300;
 }
 
 button {
@@ -137,6 +141,7 @@ button {
   border: 2px solid rgb(234, 234, 233);
   border-radius: 5px;
   box-sizing: border-box;
+  font-family: 'Poppins', sans-serif;
 }
 
 .item .item_id {
@@ -164,6 +169,18 @@ button {
   color: white;
 }
 
+.item .item__price {
+  font-weight: bold;
+  font-size: large;
+  margin: 5px 0;
+}
+
+.item .item__price span {
+  font-weight: 200;
+  font-size: medium;
+  font-family: 'Poppins', sans-serif;
+}
+
 .cart {
   display: flex;
   position: sticky;
@@ -171,7 +188,7 @@ button {
   flex-basis: 32%;
   flex-flow: column;
   background-color: rgb(241, 241, 238);
-  height: 100vh;
+  height: 90vh;
   padding: 10px;
 }
 
@@ -197,6 +214,11 @@ button {
   margin-right: 5px;
 }
 
+.cart__item__title {
+  flex-grow: 1;
+  height: 100%;
+}
+
 .empty-cart {
   width: 170px;
   height: 35px;
@@ -214,5 +236,10 @@ button {
   border: none;
   border-radius: 100%;
   background: #fff159;
+}
+
+.total-price {
+  margin: 10px;
+  text-align: center;
 }
 

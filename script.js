@@ -6,15 +6,24 @@
 const sectionItems = document.querySelector('.items');
 const olCartItems = document.querySelector('.cart__items');
 const buttonEmptyCart = document.querySelector('.empty-cart');
-const btn = document.querySelector('#back-to-top');
+const cart = document.querySelector('.cart');
 
+const btn = document.querySelector('#back-to-top');
 btn.addEventListener('click', function () {
     window.scrollTo(0, 0);
-});
-
+    // cart.style.height = '90vh';
+  });
+let controlY = 0;
 window.onscroll = () => {
-  btn.style.display = window.scrollY > 80 ? 'block' : 'none';
-  console.log(window.scrollY);
+  if (window.scrollY > 80) {
+    btn.style.display = 'block';
+    cart.style.height = '100vh';
+  } else if (window.scrollY < 80) {
+    btn.style.display = 'none';
+    const valor = (window.scrollY / 9) + 90;
+    cart.style.height = `${valor}vh`;
+  }
+  controlY = window.scrollY;
 };
 
 /**
@@ -77,14 +86,14 @@ const updateSpan = () => {
   spanTotalPrice.innerText = `$${totalPrice}`;
 };
 
-const cartItemClickListener = (e) => {
-  olCartItems.removeChild(e.target);
+function cartItemClickListener(e) {
+  olCartItems.removeChild(this);
   const localStorageCartItems = getSavedCartItems();
-  const idIndex = localStorageCartItems.indexOf(e.target.productId);
+  const idIndex = localStorageCartItems.indexOf(this.productId);
   localStorageCartItems.splice(idIndex, 1);
   saveCartItems(JSON.stringify(localStorageCartItems));
   updateSpan();
-};
+}
 
 const createImg = (src, className) => {
   const img = document.createElement('img');
@@ -103,7 +112,6 @@ const createImg = (src, className) => {
  */
 const createCartItemElement = ({ id, title, price, thumbnail }) => {
   const li = document.createElement('li');
-  console.log(thumbnail);
   li.className = 'cart__item';
   li.appendChild(createImg(thumbnail, 'cart__thumb'));
   li.appendChild(createCustomElement('p', 'cart__item__title',
@@ -159,10 +167,15 @@ const buttonEvent = async ({ productId: id, productTitle: title,
 const createProductItemElement = ({ id, title, thumbnail, price }) => {
   const section = document.createElement('section');
   section.className = 'item';
-
+  
   section.appendChild(createCustomElement('span', 'item_id', id));
   section.appendChild(createCustomElement('span', 'item__title', title));
   section.appendChild(createProductImageElement(thumbnail));
+  const preco = new Intl.NumberFormat('pt-BR', { minimumFractionDigits: 2 }).format(price);
+  const productPrice = createCustomElement('p', 'item__price', '');
+  productPrice.innerHTML = `<span>R$</span>${preco}`;
+  section.appendChild(productPrice);
+
   const button = createCustomElement('button', 'item__add', 'Adicionar ao carrinho!');
   button.productId = id;
   button.productTitle = title;
@@ -170,7 +183,7 @@ const createProductItemElement = ({ id, title, thumbnail, price }) => {
   button.productThumb = thumbnail;
   button.addEventListener('click', () => buttonEvent(button));
   section.appendChild(button);
-
+  
   return section;
 };
 
@@ -187,6 +200,22 @@ const loadProductFromStorage = (product) => {
   olCartItems.appendChild(productChild);
   updateSpan();
 };
+
+const inputSearch = document.querySelector('.search');
+const spanSearch = document.querySelector('.span-search');
+
+const searchProducts = async () => {
+  sectionItems.innerHTML = '';
+  loading(sectionItems);
+  const products = await fetchProducts(inputSearch.value);
+  loaded(sectionItems);
+  products.results.forEach((product) => {
+    sectionItems.appendChild(createProductItemElement(product));
+  });
+};
+
+inputSearch.addEventListener('change', searchProducts);
+spanSearch.addEventListener('click', searchProducts);
 
 window.onload = async () => {
   // CARREGA PRODUTOS
