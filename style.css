@@ -212,11 +212,16 @@ button {
 
 .cart__thumb {
   margin-right: 5px;
+  border-radius: 50%;
 }
 
 .cart__item__title {
   flex-grow: 1;
   height: 100%;
+}
+
+.cart__item__title span {
+  color:rgb(85, 26, 139);
 }
 
 .empty-cart {
@@ -241,5 +246,10 @@ button {
 .total-price {
   margin: 10px;
   text-align: center;
+}
+
+.total-price span {
+  font-weight: 200;
+  font-size: x-small;
 }
 

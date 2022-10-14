@@ -10,10 +10,9 @@ const cart = document.querySelector('.cart');
 
 const btn = document.querySelector('#back-to-top');
 btn.addEventListener('click', function () {
-    window.scrollTo(0, 0);
-    // cart.style.height = '90vh';
-  });
-let controlY = 0;
+  window.scrollTo(0, 0);
+});
+
 window.onscroll = () => {
   if (window.scrollY > 80) {
     btn.style.display = 'block';
@@ -23,7 +22,6 @@ window.onscroll = () => {
     const valor = (window.scrollY / 9) + 90;
     cart.style.height = `${valor}vh`;
   }
-  controlY = window.scrollY;
 };
 
 /**
@@ -62,31 +60,29 @@ const loaded = (parent) => {
   parent.removeChild(headFour);
 };
 
-// aaaaaaaaaaaaaaaaaaaaaaaaa
-
 /**
  * Função que recupera o ID do produto passado como parâmetro.
  * @param {Element} product - Elemento do produto.
  * @returns {string} ID do produto.
  */
-const getIdFromProductItem = (product) => product.querySelector('span.id').innerText;
+// const getIdFromProductItem = (product) => product.querySelector('span.id').innerText;
 
 const returnTotalPrice = (cartProducts) => {
   let totalPrice = 0;
   cartProducts.forEach(({ productPrice }) => {
     totalPrice += productPrice;
   });
-  return totalPrice;
+  return new Intl.NumberFormat('pt-BR', { style: 'currency', currency: 'BRL' }).format(totalPrice);
 };
 
 const updateSpan = () => {
   const spanTotalPrice = document.querySelector('.total-price');
   const cartProducts = olCartItems.querySelectorAll('.cart__item');
   const totalPrice = returnTotalPrice(cartProducts);
-  spanTotalPrice.innerText = `$${totalPrice}`;
+  spanTotalPrice.innerHTML = `<span>Subtotal</span>: ${totalPrice}`;
 };
 
-function cartItemClickListener(e) {
+function cartItemClickListener() {
   olCartItems.removeChild(this);
   const localStorageCartItems = getSavedCartItems();
   const idIndex = localStorageCartItems.indexOf(this.productId);
@@ -114,8 +110,12 @@ const createCartItemElement = ({ id, title, price, thumbnail }) => {
   const li = document.createElement('li');
   li.className = 'cart__item';
   li.appendChild(createImg(thumbnail, 'cart__thumb'));
-  li.appendChild(createCustomElement('p', 'cart__item__title',
-  `ID: ${id} | TITLE: ${title} | PRICE: $${price}`));
+  const description = createCustomElement('p', 'cart__item__title',
+  '');
+  const preco = new Intl.NumberFormat('pt-BR',
+    { style: 'currency', currency: 'BRL' }).format(price);
+  description.innerHTML = `${title}<br/><span>${preco}</span>`;
+  li.appendChild(description);
   li.addEventListener('click', cartItemClickListener);
   li.productId = id;
   li.productPrice = price;
