@@ -61,6 +61,12 @@ button {
   outline: 0;
 }
 
+@media (max-width: 846px) {
+  .section-search {
+    display: none;
+  }
+}
+
 .title, .title strong {
   color: rgb(85, 26, 139);
   font-size: 30px;

@@ -106,7 +106,8 @@ const createImg = (src, className) => {
  * @param {string} product.price - Preço do produto.
  * @returns {Element} Elemento de um item do carrinho.
  */
-const createCartItemElement = ({ id, title, price, thumbnail }) => {
+const createCartItemElement = (product) => {
+  const { id, title, price, thumbnail } = product;
   const li = document.createElement('li');
   li.className = 'cart__item';
   li.appendChild(createImg(thumbnail, 'cart__thumb'));
@@ -117,6 +118,7 @@ const createCartItemElement = ({ id, title, price, thumbnail }) => {
   description.innerHTML = `${title}<br/><span>${preco}</span>`;
   li.appendChild(description);
   li.addEventListener('click', cartItemClickListener);
+  li.product = product;
   li.productId = id;
   li.productPrice = price;
   li.thumbnail = thumbnail;
@@ -196,7 +198,6 @@ buttonEmptyCart.addEventListener('click', clearCart);
 
 const loadProductFromStorage = (product) => {
   const productChild = createCartItemElement(product);
-  productChild.thumbnail = product.thumbnail;
   olCartItems.appendChild(productChild);
   updateSpan();
 };
@@ -207,17 +208,26 @@ const spanSearch = document.querySelector('.span-search');
 const searchProducts = async () => {
   sectionItems.innerHTML = '';
   loading(sectionItems);
-  const products = await fetchProducts(inputSearch.value);
-  loaded(sectionItems);
-  products.results.forEach((product) => {
+  try {
+    const pesq = inputSearch.value ? inputSearch.value.trim() : 'computador';
+    const products = await fetchProducts(pesq);
+    loaded(sectionItems);
+    if (products.results.length === 0) {
+    sectionItems.appendChild(createCustomElement('h3', 'warning', 'Produto não encontrado!'));
+    }
+    products.results.forEach((product) => {
     sectionItems.appendChild(createProductItemElement(product));
-  });
+    });
+  } catch (error) {
+    sectionItems.appendChild(createCustomElement('h3', 'warning', error.message));
+  }
 };
 
 inputSearch.addEventListener('change', searchProducts);
 spanSearch.addEventListener('click', searchProducts);
 
 window.onload = async () => {
+  updateSpan();
   // CARREGA PRODUTOS
   loading(sectionItems);
   const response = await fetchProducts('computador');
